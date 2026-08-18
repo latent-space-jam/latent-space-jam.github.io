@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Latent Space Jam: Layout Guided Video Synthesis</title>
+  <meta name="description" content="A training-free method for steering pretrained video diffusion models with coarse layouts.">
+  <link rel="icon" type="image/svg+xml" href="static/images/logo_latent_jam.svg">
+  <link rel="stylesheet" href="static/css/project-page.css">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans:400,500,600,700|Castoro" rel="stylesheet">
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <div class="hero-copy">
+        <h1>Latent Space Jam</h1>
+        <p class="subtitle">Layout Guided Video Synthesis</p>
+        <nav class="cta-row" aria-label="Project links">
+          <a class="btn" id="paper-link" href="#">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm0 0v6h6M8 13h8M8 17h5"/></svg>
+            Paper <span class="soon">(coming soon)</span>
+          </a>
+          <a class="btn ghost" id="video-link" href="static/videos/project_video.mp4" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 10l5-3v10l-5-3z"/><rect x="3" y="7" width="12" height="10" rx="1.5"/></svg>
+            Video
+          </a>
+          <a class="btn ghost" id="code-link" href="#">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+            Code <span class="soon">(coming soon)</span>
+          </a>
+        </nav>
+      </div>
+
+      <figure class="teaser">
+        <div class="video-stack" tabindex="0">
+          <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_1/final.mp4"></video>
+          <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_1/final_overlays/overlay_strokes.mp4"></video>
+        </div>
+        <figcaption class="teaser-caption">
+          Two koi fish swimming in a calm pond, one <span class="hl-1">deep blue</span> and one <span class="hl-2">bright orange</span>.
+        </figcaption>
+        <p class="hover-hint">Hover to reveal the layout boxes</p>
+      </figure>
+    </div>
+  </header>
+
+  <section class="section" id="abstract">
+    <div class="wrap-narrow">
+      <h2>Coarse boxes. Coordinated motion. No extra training.</h2>
+      <div class="prose">
+        <p>
+          Adding control to video generation often requires training, extra data, or architectural changes. Latent Space Jam steers a pretrained video diffusion model with bounding boxes across frames — a training-free layout and motion interface.
+        </p>
+        <p>
+          The method runs in two passes. First, prompt-guided cross-attention is optimized so objects land where the boxes say. That coarse guide is then injected back into the same model, which restores visual quality while keeping the intended composition and trajectory.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" id="method">
+    <div class="wrap">
+      <h2>Method</h2>
+      <p class="lede">A two-pass pipeline on a frozen video diffusion backbone. Hover a stage to inspect it.</p>
+
+      <div class="method-explorer">
+        <div class="method-frame" id="method-frame">
+          <div class="method-layers">
+            <img class="method-layer method-layer-behind" src="static/videos/figures/figure_2/overview_accent_bg_arrow4a.svg" alt="" aria-hidden="true">
+            <img class="method-layer" src="static/videos/figures/figure_2/overview_base_6.svg" alt="Latent Space Jam method diagram">
+            <img class="method-layer method-layer-front" src="static/videos/figures/figure_2/overview_accent_cum_6.svg" alt="" aria-hidden="true">
+          </div>
+          <div class="method-hotspots" id="method-hotspots"></div>
+        </div>
+        <p class="hover-hint">Hover a colored block to inspect</p>
+        <p class="method-caption" id="method-caption"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="two-stage">
+    <div class="wrap">
+      <h2 class="center">Guide, then refine.</h2>
+      <p class="lede center">The first pass can look rough. That is the point: push layout as far as it will go, then let the pretrained model restore appearance.</p>
+      <div class="guide-grid">
+        <article>
+          <p class="card-label">Guide</p>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_3/base.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_3/base_overlays/overlay_strokes.mp4"></video>
+          </div>
+        </article>
+        <article>
+          <p class="card-label clay">Refined</p>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_3/final.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_3/final_overlays/overlay_strokes.mp4"></video>
+          </div>
+        </article>
+      </div>
+      <p class="prompt center">A <span class="hl-1">goat</span> climbing down some rocks.</p>
+      <p class="hover-hint">Hover either clip to reveal the layout boxes</p>
+    </div>
+  </section>
+
+  <section class="section band" id="results">
+    <div class="wrap">
+      <h2>Static placement, dynamic paths, multi-object scenes.</h2>
+      <p class="lede">Hover any clip to see the boxes that steered it.</p>
+
+      <h3 class="section-gap">Static</h3>
+      <div class="result-grid">
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/wan/horse-1/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/wan/horse-1/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">horse</span> jumping over a hurdle.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/wan/surfer-1/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/wan/surfer-1/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">man</span> surfing on the waves.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/wan/motorcycle-1/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/wan/motorcycle-1/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">motorcycle</span> driving on the road.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/ltx/black-dog-2/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/ltx/black-dog-2/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">black dog</span> walking in a park.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/wan/cow-1/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/wan/cow-1/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">cow</span> walking on a grassy field.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/ltx/black-swan-2/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/static/ltx/black-swan-2/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">black swan</span> swimming in a lake.</p>
+        </article>
+      </div>
+
+      <h3 class="section-gap">Dynamic</h3>
+      <div class="result-grid">
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/goat-slalom-from-tl/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/goat-slalom-from-tl/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">goat</span> climbing down some rocks.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/car-roundabout-from-tl/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/car-roundabout-from-tl/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">car</span> driving around a roundabout.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/motorcyclist-jumping-l-to-r/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/motorcyclist-jumping-l-to-r/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">motorcyclist</span> jumping over a bump.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/man-jumping-l-to-r/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/man-jumping-l-to-r/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">man</span> jumping over a fence.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/ltx/bicyclist-l-to-r/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/ltx/bicyclist-l-to-r/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">bicyclist</span> riding in front of a painted wall.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/man-parachute-tl-to-br-curve/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/dynamic/wan/man-parachute-tl-to-br-curve/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">man</span> flying off a cliff with a parachute.</p>
+        </article>
+      </div>
+
+      <h3 class="section-gap">Multi-object</h3>
+      <div class="result-grid">
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/fishes-cw/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/fishes-cw/overlay.mp4"></video>
+          </div>
+          <p class="prompt">Two koi fish, one <span class="hl-1">deep blue</span> and one <span class="hl-2">bright orange</span>.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/spiderman/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/spiderman/overlay.mp4"></video>
+          </div>
+          <p class="prompt"><span class="hl-1">Spider-Man</span> swooping in and sticking to a <span class="hl-2">skyscraper wall</span>.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/dunk-moon-3-parts/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/dunk-moon-3-parts/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">basketball player</span> dunking into a <span class="hl-3">hoop</span> on the <span class="hl-2">moon</span>.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/spirit-tl/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/spirit-tl/overlay.mp4"></video>
+          </div>
+          <p class="prompt"><span class="hl-1">Glowing ink spirit</span> flying through <span class="hl-2">ancient stone pillars</span>.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/ski/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/ski/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">skier</span> carving a slalom through <span class="hl-2">trees</span>.</p>
+        </article>
+        <article>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/blobs/original.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/samples_overview/multi/wan/blobs/overlay.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-2">paint figure</span> colliding with an <span class="hl-1">ink shadow</span>.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="comparison">
+    <div class="wrap">
+      <h2>The same boxes, across methods.</h2>
+      <p class="lede">Each row uses one prompt and one layout. We show text-to-video, prior training-free methods, and Latent Space Jam side by side.</p>
+
+      <div class="compare-row">
+        <h3>Dynamic</h3>
+        <p class="prompt">A <span class="hl-1">bicyclist</span> riding in front of a painted wall.</p>
+        <div class="compare-grid">
+          <figure>
+            <p class="card-label">Layout</p>
+            <div class="video-stack">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/mask_colored.mp4"></video>
+            </div>
+          </figure>
+          <figure class="is-ours">
+            <p class="card-label">Ours</p>
+            <div class="video-stack" tabindex="0">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/ours_wan.mp4"></video>
+              <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/ours_wan_overlays/overlay_strokes.mp4"></video>
+            </div>
+          </figure>
+          <figure>
+            <p class="card-label">T2V</p>
+            <div class="video-stack" tabindex="0">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/t2v.mp4"></video>
+              <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/t2v_overlays/overlay_strokes.mp4"></video>
+            </div>
+          </figure>
+          <figure>
+            <p class="card-label">TrailBlazer</p>
+            <div class="video-stack" tabindex="0">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/trailblazer.mp4"></video>
+              <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/trailblazer_overlays/overlay_strokes.mp4"></video>
+            </div>
+          </figure>
+          <figure>
+            <p class="card-label">FreeTraj</p>
+            <div class="video-stack" tabindex="0">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/freetraj.mp4"></video>
+              <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/freetraj_overlays/overlay_strokes.mp4"></video>
+            </div>
+          </figure>
+          <figure>
+            <p class="card-label">Peekaboo</p>
+            <div class="video-stack" tabindex="0">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/peekaboo.mp4"></video>
+              <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/dynamic/peekaboo_overlays/overlay_strokes.mp4"></video>
+            </div>
+          </figure>
+        </div>
+      </div>
+
+      <div class="compare-row">
+        <h3>Multi-object</h3>
+        <p class="prompt">A <span class="hl-1">man</span> walking calmly as a dramatic <span class="hl-2">explosion</span> erupts behind him.</p>
+        <div class="compare-grid four">
+          <figure>
+            <p class="card-label">Layout</p>
+            <div class="video-stack">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/multi/mask_colored.mp4"></video>
+            </div>
+          </figure>
+          <figure class="is-ours">
+            <p class="card-label">Ours</p>
+            <div class="video-stack" tabindex="0">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/multi/ours_wan.mp4"></video>
+              <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/multi/ours_wan_overlays/overlay_strokes.mp4"></video>
+            </div>
+          </figure>
+          <figure>
+            <p class="card-label">T2V</p>
+            <div class="video-stack" tabindex="0">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/multi/t2v.mp4"></video>
+              <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/multi/t2v_overlays/overlay_strokes.mp4"></video>
+            </div>
+          </figure>
+          <figure>
+            <p class="card-label">TrailBlazer</p>
+            <div class="video-stack" tabindex="0">
+              <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/multi/trailblazer.mp4"></video>
+              <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_7/multi/trailblazer_overlays/overlay_strokes.mp4"></video>
+            </div>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" id="applications">
+    <div class="wrap">
+      <h2>Editing and stylization.</h2>
+      <p class="lede">Layout-guided attention also edits an existing video or restyles selected tokens, still without training.</p>
+
+      <div class="edit-grid section-gap">
+        <article class="is-cinema">
+          <p class="card-label">Edited</p>
+          <div class="video-stack" tabindex="0">
+            <video width="848" height="480" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_8/editing/joker_fire.mp4"></video>
+            <video class="overlay-video" width="848" height="480" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_8/editing/joker.mp4"></video>
+          </div>
+          <p class="prompt">The Joker speaks in front of the camera while his <span class="hl-2">hair</span> is on <span class="hl-2">fire</span>.</p>
+          <p class="hover-hint">Hover for the source</p>
+        </article>
+        <article class="is-portrait">
+          <p class="card-label">Edited</p>
+          <div class="video-stack" tabindex="0">
+            <video width="480" height="720" autoplay muted loop playsinline preload="metadata" src="static/videos/additional-applications/lightbulb/final.mp4"></video>
+            <video class="overlay-video" width="480" height="720" autoplay muted loop playsinline preload="metadata" src="static/videos/additional-applications/lightbulb/source.mp4"></video>
+          </div>
+          <p class="prompt">A <span class="hl-1">lightbulb</span> hanging in front of a brick wall, <span class="hl-1">glowing brightly</span>.</p>
+          <p class="hover-hint">Hover for the source</p>
+        </article>
+        <article>
+          <p class="card-label">Stylization</p>
+          <div class="video-stack" tabindex="0">
+            <video autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_8/stylization/final.mp4"></video>
+            <video class="overlay-video" autoplay muted loop playsinline preload="metadata" src="static/videos/figures/figure_8/stylization/final_overlays/overlay_strokes.mp4"></video>
+          </div>
+          <p class="prompt">Film noir scene of a woman walking. The entire scene is monochrome — except her dress, which is <span class="hl-1">vivid crimson red</span>.</p>
+          <p class="hover-hint">Hover to reveal the layout boxes</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="numbers">
+    <div class="wrap">
+      <h2>Numbers</h2>
+      <p class="lede">Refined-stage results. Latent Space Jam is strongest on overlap and trajectory, and stays competitive on visual quality.</p>
+
+      <div class="table-block">
+        <div class="table-scroll">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Method</th>
+                <th class="group" colspan="5">Static</th>
+                <th class="group" colspan="5">Dynamic</th>
+                <th class="group" colspan="5">Multi-object</th>
+              </tr>
+              <tr>
+                <th>IoU ↑</th><th>CD ↓</th><th>I-AP50 ↑</th><th>FVD ↓</th><th>CLIP ↑</th>
+                <th>IoU ↑</th><th>CD ↓</th><th>I-AP50 ↑</th><th>FVD ↓</th><th>CLIP ↑</th>
+                <th>IoU ↑</th><th>CD ↓</th><th>I-AP50 ↑</th><th>FVD ↓</th><th>CLIP ↑</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Peekaboo</td>
+                <td>19.45</td><td>18.96</td><td>66.71</td><td>132.92</td><td>29.14</td>
+                <td>11.89</td><td>25.06</td><td>43.45</td><td>126.75</td><td>29.37</td>
+                <td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td>
+              </tr>
+              <tr>
+                <td>FreeTraj</td>
+                <td>19.47</td><td>17.08</td><td>57.56</td><td>126.75</td><td>30.20</td>
+                <td>13.91</td><td>21.68</td><td>42.41</td><td class="is-best">110.90</td><td>29.94</td>
+                <td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td><td class="empty">—</td>
+              </tr>
+              <tr>
+                <td>TrailBlazer</td>
+                <td>16.95</td><td>19.42</td><td>45.13</td><td>126.76</td><td>30.26</td>
+                <td>14.40</td><td>22.71</td><td>42.43</td><td>114.37</td><td>29.86</td>
+                <td>11.60</td><td>33.53</td><td>36.92</td><td>235.19</td><td>30.00</td>
+              </tr>
+              <tr>
+                <td>TrailBlazer (Wan 2.2)</td>
+                <td>21.25</td><td>18.89</td><td>56.03</td><td>140.14</td><td>28.75</td>
+                <td>17.46</td><td>19.95</td><td>49.86</td><td>135.63</td><td>29.61</td>
+                <td>13.86</td><td>32.47</td><td>33.51</td><td>204.73</td><td>31.27</td>
+              </tr>
+              <tr>
+                <td>T2I</td>
+                <td>21.44</td><td>20.49</td><td>60.87</td><td>174.56</td><td>26.11</td>
+                <td>27.23</td><td>17.42</td><td>62.67</td><td>174.95</td><td>26.63</td>
+                <td>11.95</td><td>36.11</td><td>34.27</td><td>221.30</td><td>24.20</td>
+              </tr>
+              <tr class="is-ours">
+                <td>Ours (Wan 2.2)</td>
+                <td>28.24</td><td>12.87</td><td>80.30</td><td class="is-best">117.41</td><td>28.93</td>
+                <td>27.64</td><td>11.24</td><td>84.57</td><td>132.38</td><td>27.63</td>
+                <td>25.83</td><td class="is-best">21.87</td><td class="is-best">69.03</td><td class="is-best">198.57</td><td>30.76</td>
+              </tr>
+              <tr class="is-ours">
+                <td>Ours (LTX-2)</td>
+                <td class="is-best">36.55</td><td class="is-best">9.84</td><td class="is-best">81.38</td><td>130.10</td><td class="is-best">31.08</td>
+                <td class="is-best">35.24</td><td class="is-best">10.74</td><td class="is-best">88.42</td><td>119.30</td><td class="is-best">31.13</td>
+                <td class="is-best">27.23</td><td>22.41</td><td>60.74</td><td>228.52</td><td class="is-best">32.05</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section band" id="BibTeX">
+    <div class="wrap-narrow">
+      <div class="bibtex-header">
+        <h2>BibTeX</h2>
+        <button class="copy-bibtex-btn" type="button" id="copy-bibtex">Copy</button>
+      </div>
+      <pre><code id="bibtex-text">@misc{anonymous2026latent,
+  title  = {Latent Space Jam: Layout Guided Video Synthesis},
+  author = {Anonymous},
+  year   = {2026}
+}</code></pre>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <p>Latent Space Jam</p>
+  </footer>
+
+  <script src="static/js/project-page.js"></script>
+</body>
+</html>
